@@ -361,7 +361,7 @@ ${ingredients ? `추가 재료/요청사항: ${ingredients}` : ''}
                     ingredientsList = content
                         .split('\n')
                         .map(item => item.trim())
-                        .filter(item => item.length > 2 && item.length < 50)
+                        .filter(item => item.length > 0 && item.length < 50)
                         .filter(item => !item.match(/^(예시|응답|규칙|식재료|보이는|다음|형식|:|！)/));
                 }
 
