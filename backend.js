@@ -157,10 +157,10 @@ ${ingredients ? `추가 재료/요청사항: ${ingredients}` : ''}
     /**
      * API 호출 (서버리스 또는 직접)
      */
-    async callAPI(prompt, imageBase64 = null) {
-        // 서버리스 API 사용
+    async callAPI(prompt, imageBase64 = null, payload = null) {
+        // 서버리스 API 사용: 질문 문장은 서버가 만들고, 여기서는 종류·재료·사진만 보낸다
         if (this.useServerlessAPI) {
-            return await this.callServerlessAPI(prompt, imageBase64);
+            return await this.callServerlessAPI(payload || { type: 'recipe', ingredients: '', imageBase64 });
         }
 
         // 직접 OpenRouter API 호출 (로컬 개발용)
@@ -170,17 +170,14 @@ ${ingredients ? `추가 재료/요청사항: ${ingredients}` : ''}
     /**
      * 서버리스 함수 호출
      */
-    async callServerlessAPI(prompt, imageBase64 = null) {
+    async callServerlessAPI(payload) {
         try {
             const response = await fetch(this.serverlessUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    imageBase64: imageBase64
-                })
+                body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
@@ -316,7 +313,7 @@ ${ingredients ? `추가 재료/요청사항: ${ingredients}` : ''}
 
         try {
             console.log('재료 인식 중...');
-            const response = await this.callAPI(prompt, imageBase64);
+            const response = await this.callAPI(prompt, imageBase64, { type: 'ingredients', imageBase64 });
 
             if (response.choices && response.choices[0] && response.choices[0].message) {
                 const content = response.choices[0].message.content;
@@ -393,7 +390,7 @@ ${ingredients ? `추가 재료/요청사항: ${ingredients}` : ''}
 
         try {
             console.log('레시피 생성 중...', hasImage ? '(이미지 포함)' : '');
-            const response = await this.callAPI(prompt, imageBase64);
+            const response = await this.callAPI(prompt, imageBase64, { type: 'recipe', ingredients: ingredients || '', imageBase64 });
 
             if (response.choices && response.choices[0] && response.choices[0].message) {
                 const result = this.parseRecipeResponse(response.choices[0].message.content);
