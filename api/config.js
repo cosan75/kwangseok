@@ -4,6 +4,10 @@
  */
 
 export default async function handler(req, res) {
+    // 운영 중지(2026-11-06): 모든 요청을 AI 호출 없이 거절한다. 다시 열려면 이 두 줄을 지운다.
+    res.setHeader("Cache-Control", "no-store");
+    return res.status(503).json({ error: "운영을 멈춘 앱입니다." });
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
 
